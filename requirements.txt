@@ -1,0 +1,5 @@
+msynth @ git+https://github.com/mrphrazer/msynth@d719a58
+miasm @ git+https://github.com/cea-sec/miasm@90dc167
+z3-solver
+wheel
+
